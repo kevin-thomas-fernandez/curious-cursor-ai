@@ -10,7 +10,7 @@
 - 🖠️ Practical solutions to everyday developer tasks
 - ✨ Tips, prompts, and usage patterns for better AI-assisted coding
 - 📦 Mini tools, scripts, or utilities powered by AI suggestions
-- Python, C++, Javascript and HTML 
+- Python, JavaScript, HTML, and a little bit of C++
 
 ## 🚀 Why This Exists
 
