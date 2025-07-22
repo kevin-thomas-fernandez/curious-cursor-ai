@@ -1,0 +1,86 @@
+body {
+    background: #f7f6fd;
+    font-family: 'Segoe UI', sans-serif;
+    margin: 0;
+    padding: 0;
+}
+.container {
+    max-width: 600px;
+    margin: 40px auto;
+    background: #fff;
+    border-radius: 18px;
+    box-shadow: 0 4px 24px rgba(0,0,0,0.08);
+    padding: 32px 24px;
+    text-align: center;
+}
+h1 {
+    font-size: 2.5em;
+    margin-bottom: 16px;
+    color: #6c47ff;
+    letter-spacing: 2px;
+}
+textarea {
+    width: 100%;
+    min-height: 100px;
+    border-radius: 10px;
+    border: 2px solid #e0e0e0;
+    padding: 12px;
+    font-size: 1em;
+    margin-bottom: 18px;
+    resize: vertical;
+}
+.options {
+    display: flex;
+    justify-content: center;
+    gap: 24px;
+    margin-bottom: 24px;
+}
+.options label {
+    font-size: 1em;
+    color: #444;
+}
+.cards {
+    display: flex;
+    gap: 18px;
+    justify-content: center;
+    margin-bottom: 24px;
+}
+.card {
+    background: #f0eaff;
+    border-radius: 14px;
+    box-shadow: 0 2px 8px rgba(108,71,255,0.08);
+    padding: 18px 14px;
+    width: 160px;
+    cursor: pointer;
+    transition: transform 0.12s, box-shadow 0.12s;
+    border: 2px solid transparent;
+}
+.card:hover {
+    transform: translateY(-6px) scale(1.04) rotate(-2deg);
+    box-shadow: 0 6px 24px rgba(108,71,255,0.18);
+    border: 2px solid #6c47ff;
+}
+.card h2 {
+    font-size: 1.1em;
+    margin: 0 0 8px 0;
+    color: #6c47ff;
+}
+.card p {
+    font-size: 0.95em;
+    color: #555;
+}
+#summary-output {
+    margin-top: 24px;
+    font-size: 1.1em;
+    color: #333;
+    min-height: 40px;
+    background: #f8f6ff;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 1px 4px rgba(108,71,255,0.06);
+}
+@media (max-width: 700px) {
+    .container { padding: 16px 4px; }
+    .cards { flex-direction: column; gap: 12px; }
+    .card { width: 100%; }
+} 

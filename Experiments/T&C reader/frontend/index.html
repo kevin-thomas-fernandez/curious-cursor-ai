@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>T&C Reader</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>🤓 T&C Reader</h1>
+        <textarea id="tc-input" placeholder="Paste your Terms & Conditions here..."></textarea>
+        <div class="options">
+            <label>Age Group:
+                <select id="age-group">
+                    <option value="child">Child</option>
+                    <option value="teen">Teen</option>
+                    <option value="adult" selected>Adult</option>
+                </select>
+            </label>
+            <label>Tone:
+                <select id="tone">
+                    <option value="serious" selected>Serious</option>
+                    <option value="comedy">Comedy</option>
+                </select>
+            </label>
+        </div>
+        <div class="cards">
+            <div class="card" data-category="data">
+                <h2>🔒 Data Usage & Privacy</h2>
+                <p>What do they do with your data?</p>
+            </div>
+            <div class="card" data-category="rights">
+                <h2>⚖️ User Rights & Responsibilities</h2>
+                <p>What are you allowed to do?</p>
+            </div>
+            <div class="card" data-category="cancellation">
+                <h2>💸 Cancellation & Refunds</h2>
+                <p>Can you get your money back?</p>
+            </div>
+        </div>
+        <div id="summary-output"></div>
+    </div>
+    <script src="app.js"></script>
+</body>
+</html> 
