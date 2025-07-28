@@ -27,7 +27,7 @@ def convert_csv_to_xlsx():
             continue
 
     messagebox.showinfo("Success", "Conversion complete!")
-    root.destroy()
+
 
 
 def compare_csv_and_xlsx():
