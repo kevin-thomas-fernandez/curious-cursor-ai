@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { User } from '../types';
+import CryptoJS from 'crypto-js';
 
 interface LoginProps {
   onLogin: (user: User) => void;
@@ -21,10 +22,9 @@ const USERS: User[] = [
   }
 ];
 
-// Passwords loaded from environment variables with fallbacks
-const PASSWORDS: Record<string, string> = {
-  [import.meta.env.VITE_USER1_USERNAME || 'diana']: import.meta.env.VITE_USER1_PASSWORD || 'FlamingoTea',
-  [import.meta.env.VITE_USER2_USERNAME || 'KTF']: import.meta.env.VITE_USER2_PASSWORD || 'BullTea'
+const HASHED_PASSWORDS: Record<string, string> = {
+  [import.meta.env.VITE_USER1_USERNAME || 'diana']: import.meta.env.VITE_USER1_PASSWORD_HASH || '317e92d7e4ac8f75641b40ae4d16ba9247c4b5ad8fd26eca2c9dbe5cfbdb8c0f',
+  [import.meta.env.VITE_USER2_USERNAME || 'KTF']: import.meta.env.VITE_USER2_PASSWORD_HASH || '7b79c2fbd62f35f92c5bcd8643aa65124ba05844aac2ce977dc0eeadd393f1e2'
 };
 
 export function Login({ onLogin }: LoginProps) {
@@ -49,7 +49,9 @@ export function Login({ onLogin }: LoginProps) {
       return;
     }
 
-    if (PASSWORDS[username] !== password) {
+    // Hash the entered password and compare with stored hash
+    const enteredPasswordHash = CryptoJS.SHA256(password).toString();
+    if (HASHED_PASSWORDS[username] !== enteredPasswordHash) {
       setError('Invalid password');
       setIsLoading(false);
       return;
