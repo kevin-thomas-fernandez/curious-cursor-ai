@@ -1,0 +1,717 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jengappa Blast</title>
+    <!-- Firebase SDK -->
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // Your Firebase configuration - Replace with your actual config
+        // Get this from: Firebase Console > Project Settings > Your apps > Web app config
+        const firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "YOUR_AUTH_DOMAIN",
+            projectId: "YOUR_PROJECT_ID",
+            storageBucket: "YOUR_STORAGE_BUCKET",
+            messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        // Initialize Firebase
+        try {
+            const app = initializeApp(firebaseConfig);
+            const db = getFirestore(app);
+            
+            // Make Firebase available globally
+            window.firebaseApp = app;
+            window.db = db;
+            
+            console.log('✅ Firebase initialized successfully!');
+            console.log('Project ID:', firebaseConfig.projectId);
+        } catch (error) {
+            console.error('❌ Firebase initialization error:', error);
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #E6E6FA 0%, #FFB6C1 100%);
+            min-height: 100vh;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        .main-layout {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        .left-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .left-content .page {
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .right-sidebar {
+            width: 350px;
+            flex-shrink: 0;
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-left: 2px solid rgba(255, 255, 255, 0.5);
+            overflow-y: auto;
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1001;
+            background: rgba(255, 182, 193, 0.9);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            font-size: 24px;
+            color: #333;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(10px);
+        }
+
+        .mobile-menu-btn:active {
+            transform: scale(0.95);
+        }
+
+        .sidebar-close-btn {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .sidebar-close-btn {
+                display: block;
+                position: absolute;
+                top: 15px;
+                right: 15px;
+                background: rgba(255, 182, 193, 0.9);
+                border: none;
+                border-radius: 50%;
+                width: 40px;
+                height: 40px;
+                font-size: 20px;
+                color: #333;
+                cursor: pointer;
+                box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .sidebar-close-btn:active {
+                transform: scale(0.95);
+            }
+        }
+
+        .sidebar-overlay {
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                flex-direction: column;
+            }
+
+            .left-content {
+                padding: 20px;
+                width: 100%;
+            }
+
+            .right-sidebar {
+                position: fixed;
+                top: 0;
+                right: -100%;
+                width: 280px;
+                height: 100vh;
+                z-index: 1000;
+                transition: right 0.3s ease;
+                border-left: none;
+                box-shadow: -4px 0 20px rgba(0, 0, 0, 0.2);
+                padding-top: 60px;
+            }
+
+            .right-sidebar.open {
+                right: 0;
+            }
+
+            .sidebar-overlay {
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                z-index: 999;
+                opacity: 0;
+                visibility: hidden;
+                transition: opacity 0.3s ease, visibility 0.3s ease;
+            }
+
+            .sidebar-overlay.open {
+                opacity: 1;
+                visibility: visible;
+            }
+
+            .mobile-menu-btn {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+
+            .hero-content {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .drink-image {
+                max-width: 100%;
+            }
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 800;
+            margin-bottom: 10px;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.8);
+            letter-spacing: -1px;
+        }
+
+        .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            font-weight: 300;
+        }
+
+        .tagline {
+            font-size: 1rem;
+            font-style: italic;
+            margin-top: 10px;
+            opacity: 0.8;
+        }
+
+        .hero-content {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .hero-text {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .drink-image {
+            max-width: 350px;
+            width: 100%;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .price {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: #DDA0DD;
+            margin: 15px 0;
+        }
+
+        .price-label {
+            color: #555;
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .page {
+            display: none;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sidebar-section {
+            margin-bottom: 30px;
+        }
+
+        .sidebar-title {
+            font-size: 1.5rem;
+            color: #DDA0DD;
+            margin-bottom: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .sidebar-title:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .sidebar-title.active {
+            background: rgba(255, 182, 193, 0.4);
+        }
+
+        .sidebar-content {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            padding: 0 10px;
+        }
+
+        .flavor-description {
+            color: #555;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            background: rgba(255, 240, 245, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            border-left: 4px solid #FFB6C1;
+            margin-top: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .ingredients-list, .method-list {
+            list-style: none;
+            padding: 0;
+            margin: 15px 0;
+        }
+
+        .ingredients-list li, .method-list li {
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.8;
+            padding: 8px 0;
+            padding-left: 25px;
+            position: relative;
+        }
+
+        .ingredients-list li:before {
+            content: "•";
+            color: #DDA0DD;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            font-size: 1.5rem;
+        }
+
+        .method-list li {
+            counter-increment: step-counter;
+        }
+
+        .method-list {
+            counter-reset: step-counter;
+        }
+
+        .method-list li:before {
+            content: counter(step-counter);
+            color: white;
+            background: #DDA0DD;
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.85rem;
+            font-weight: 600;
+            position: absolute;
+            left: 0;
+            top: 6px;
+        }
+
+        .alternate-version {
+            background: rgba(255, 250, 205, 0.6);
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border-left: 4px solid #FFB6C1;
+            backdrop-filter: blur(10px);
+        }
+
+        .alternate-version-title {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .alternate-version-content {
+            color: #555;
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        .presentation {
+            background: linear-gradient(135deg, rgba(255, 240, 245, 0.6) 0%, rgba(255, 250, 205, 0.6) 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            backdrop-filter: blur(10px);
+        }
+
+        .presentation-title {
+            font-size: 1.2rem;
+            color: #333;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+
+        .presentation-content {
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.7;
+        }
+
+        .about-section {
+            text-align: center;
+        }
+
+        .founder-image {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 4px solid #DDA0DD;
+            box-shadow: 0 10px 30px rgba(221, 160, 221, 0.3);
+            margin: 20px auto;
+            display: block;
+        }
+
+        .founder-title {
+            font-size: 1.5rem;
+            color: #DDA0DD;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .founder-description {
+            color: #555;
+            font-size: 1rem;
+            line-height: 1.7;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .page-title {
+            font-size: 2.5rem;
+            color: #DDA0DD;
+            margin-bottom: 30px;
+            font-weight: 700;
+        }
+
+        .section-subtitle {
+            font-size: 1.3rem;
+            color: #333;
+            margin-bottom: 15px;
+            font-weight: 600;
+            margin-top: 25px;
+        }
+
+        .home-description {
+            text-align: center;
+            font-size: 1.3rem;
+            color: #555;
+            line-height: 1.8;
+            margin-top: 40px;
+            padding: 30px;
+            background: rgba(255, 240, 245, 0.5);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+    <div class="main-layout">
+        <div class="left-content">
+            <!-- Home Page -->
+            <div class="page active" id="home">
+                <div class="hero">
+                    <h1>Jengappa Blast</h1>
+                    <p class="subtitle">Signature Drink</p>
+                    <p class="tagline">Cus why not.</p>
+                    <div class="hero-content">
+                        <div class="hero-text">
+                            <div class="price-label">Price</div>
+                            <div class="price">$6 USD</div>
+                        </div>
+                        <img src="Jengappa blast drink.jpg" alt="Jengappa Blast Drink" class="drink-image">
+                    </div>
+                    <div class="home-description">
+                        That Bombat drink is a Sakkath scene, macha. One sip and you'll be like "Yaake, this is too good, yaar!"
+                    </div>
+                </div>
+            </div>
+
+            <!-- Flavor Profile Page -->
+            <div class="page" id="flavor">
+                <h2 class="page-title">Flavor Profile</h2>
+                <div class="flavor-description">
+                    Citrus-melon base like Baja Blast → layered with kokum tang, a touch of cardamom mist, and a chill-kick from mint + green chili essence. Tropical, spicy, and bright.
+                </div>
+                <div class="flavor-description" style="margin-top: 20px;">
+                    <strong>Taste:</strong> bright citrus → tangy kokum → sweet-melon → whisper of spice.<br>
+                    NYC energy + Bengaluru soul.
+                </div>
+            </div>
+
+            <!-- Ingredients Page -->
+            <div class="page" id="ingredients">
+                <h2 class="page-title">Ingredients</h2>
+                <div class="section-subtitle">Single 12–14 oz serving</div>
+                <ul class="ingredients-list">
+                    <li>½ cup lime juice (fresh)</li>
+                    <li>¼ cup nimbu soda or club soda</li>
+                    <li>¾ cup cold melon soda (honeydew or Mountain Dew as fallback)</li>
+                    <li>2 tbsp kokum syrup</li>
+                    <li>1 tsp jaggery syrup (or brown sugar syrup)</li>
+                    <li>2–3 mint leaves, slapped for aroma</li>
+                    <li>1 drop green chili tincture (optional but makes it pop)</li>
+                    <li>Tiny pinch cardamom</li>
+                    <li>Ice—crushed</li>
+                </ul>
+            </div>
+
+            <!-- Method Page -->
+            <div class="page" id="method">
+                <h2 class="page-title">Method</h2>
+                <ol class="method-list">
+                    <li>Fill a chilled glass with crushed ice.</li>
+                    <li>Shake together: lime juice + kokum syrup + jaggery syrup + a pinch of cardamom.</li>
+                    <li>Pour over ice.</li>
+                    <li>Add melon soda + nimbu soda for fizz.</li>
+                    <li>Toss in mint.</li>
+                    <li>Finish with one drop of green-chili tincture for a warm after-kick.</li>
+                </ol>
+            </div>
+
+            <!-- Alternate Versions Page -->
+            <div class="page" id="alternate">
+                <h2 class="page-title">Alternate Versions</h2>
+                
+                <div class="alternate-version">
+                    <div class="alternate-version-title">1. Jengappa Blast Zero (Sugar-Free)</div>
+                    <div class="alternate-version-content">
+                        Swap kokum syrup for kokum water extract. Use diet lemon-lime soda + a few drops of stevia. Add a spritz of ginger cold-press for bite.
+                    </div>
+                </div>
+
+                <div class="alternate-version">
+                    <div class="alternate-version-title">2. Jengappa Blast Creamstorm</div>
+                    <div class="alternate-version-content">
+                        Add 1 tbsp sweetened condensed milk. Shake vigorously. Tastes like Baja Blast meets Bengaluru falooda vibes.
+                    </div>
+                </div>
+
+                <div class="alternate-version">
+                    <div class="alternate-version-title">3. Jengappa Street Heat</div>
+                    <div class="alternate-version-content">
+                        Rim the glass with chili-salt + chaat masala. Add ½ tsp raw mango (amchur) syrup. Massive flavor punch.
+                    </div>
+                </div>
+
+                <div class="alternate-version">
+                    <div class="alternate-version-title">4. Jengappa Night Mode (Cocktail)</div>
+                    <div class="alternate-version-content">
+                        1 oz vodka or white rum. ½ oz kokum liqueur (if available). Everything else the same. Perfect high-energy summer drink.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Presentation Page -->
+            <div class="page" id="presentation">
+                <h2 class="page-title">Presentation</h2>
+                <div class="presentation">
+                    <div class="presentation-title">Optional but killer</div>
+                    <div class="presentation-content">
+                        Serve in tall glass. Teal + ruby swirl from kokum gives that Baja Blast visual twist. Mint crown on top.
+                    </div>
+                </div>
+            </div>
+
+            <!-- About Page -->
+            <div class="page" id="about">
+                <h2 class="page-title">About</h2>
+                <div class="about-section">
+                    <div class="founder-title">Founder</div>
+                    <img src="Jengappa blast.jpeg" alt="Founder" class="founder-image">
+                    <div class="founder-description">
+                        The creator behind Jengappa Blast, bringing together the vibrant energy of NYC with the soulful flavors of Bengaluru. This signature drink represents a fusion of cultures, tastes, and experiences—because why not?
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="right-sidebar">
+            <button class="sidebar-close-btn" onclick="toggleSidebar()" aria-label="Close menu">×</button>
+            <div class="sidebar-section">
+                <div class="sidebar-title active" onclick="showPage('home', this)">Home</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title" onclick="showPage('flavor', this)">Flavor Profile</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title" onclick="showPage('ingredients', this)">Ingredients</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title" onclick="showPage('method', this)">Method</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title" onclick="showPage('alternate', this)">Alternate Versions</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title" onclick="showPage('presentation', this)">Presentation</div>
+            </div>
+            <div class="sidebar-section">
+                <div class="sidebar-title" onclick="showPage('about', this)">About</div>
+            </div>
+        </div>
+        <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+    </div>
+
+    <button class="mobile-menu-btn" onclick="toggleSidebar()" aria-label="Toggle menu">☰</button>
+
+    <script type="module">
+        import { collection, addDoc, getDocs } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        // Wait for Firebase to initialize
+        const checkFirebase = setInterval(() => {
+            if (window.db) {
+                clearInterval(checkFirebase);
+                console.log('✅ Firebase is ready to use!');
+                
+                // Example function to test Firebase connection
+                window.testFirebase = async () => {
+                    try {
+                        const testCollection = collection(window.db, 'test');
+                        const querySnapshot = await getDocs(testCollection);
+                        console.log('✅ Firebase connection test successful!', querySnapshot);
+                        return true;
+                    } catch (error) {
+                        console.error('❌ Firebase connection test failed:', error);
+                        return false;
+                    }
+                };
+                
+                // Example function to add data
+                window.addToFirebase = async (collectionName, data) => {
+                    try {
+                        const docRef = await addDoc(collection(window.db, collectionName), data);
+                        console.log('✅ Document written with ID: ', docRef.id);
+                        return docRef.id;
+                    } catch (error) {
+                        console.error('❌ Error adding document: ', error);
+                        return null;
+                    }
+                };
+                
+                // Example function to get data
+                window.getFromFirebase = async (collectionName) => {
+                    try {
+                        const querySnapshot = await getDocs(collection(window.db, collectionName));
+                        const data = [];
+                        querySnapshot.forEach((doc) => {
+                            data.push({ id: doc.id, ...doc.data() });
+                        });
+                        console.log('✅ Data retrieved:', data);
+                        return data;
+                    } catch (error) {
+                        console.error('❌ Error getting documents: ', error);
+                        return [];
+                    }
+                };
+            }
+        }, 100);
+        
+        // Timeout after 5 seconds
+        setTimeout(() => {
+            clearInterval(checkFirebase);
+            if (!window.db) {
+                console.warn('⚠️ Firebase initialization timeout. Check your config.');
+            }
+        }, 5000);
+    </script>
+    
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.querySelector('.right-sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('open');
+        }
+
+        function showPage(pageId, element) {
+            // Hide all pages
+            document.querySelectorAll('.page').forEach(page => {
+                page.classList.remove('active');
+            });
+
+            // Remove active class from all sidebar titles
+            document.querySelectorAll('.sidebar-title').forEach(title => {
+                title.classList.remove('active');
+            });
+
+            // Show selected page
+            document.getElementById(pageId).classList.add('active');
+
+            // Add active class to clicked sidebar title
+            element.classList.add('active');
+
+            // Close sidebar on mobile after selecting a page
+            if (window.innerWidth <= 768) {
+                toggleSidebar();
+            }
+        }
+    </script>
+</body>
+</html>
